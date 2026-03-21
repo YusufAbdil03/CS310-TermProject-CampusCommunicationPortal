@@ -28,9 +28,9 @@ This mobile application is developed using the **Flutter** framework as part of 
 ## Team Organization
 The project is managed through clearly defined coordination roles to ensure smooth operations and milestone tracking:
 
-* **[Member 1 Name] (ID)**: **Project Coordinator** – Oversees team meetings and ensures milestones are met.
-* **[Member 2 Name] (ID)**: **Documentation & Submission Lead** – Prepares written materials and handles SUCourse submissions.
-* **[Member 3 Name] (ID)**: **Testing & Quality Assurance Lead** – Regularly reviews and tests features to ensure code quality.
-* **[Member 4 Name] (ID)**: **Integration & Repository Lead** – Manages the GitHub repository and coordinates version control.
-* **[Member 5 Name] (ID)**: **Presentation & Communication Lead** – Organizes demo presentations and communicates with instructors/TAs.
-* **[Member 6 Name] (ID)**: **Learning & Research Lead** – Researches new Flutter widgets, tools, and relevant APIs.
+* **Yusuf Abdil Yıldız (34021)**: **Project Coordinator** – Oversees team meetings and ensures milestones are met.
+* **Serkan Dağ (34255)**: **Documentation & Submission Lead** – Prepares written materials and handles SUCourse submissions.
+* **Emir Eğilli (32079)**: **Testing & Quality Assurance Lead** – Regularly reviews and tests features to ensure code quality.
+* **Lim Yi (38465)**: **Integration & Repository Lead** – Manages the GitHub repository and coordinates version control.
+* **İdil Işıl Yıldırım (32049)**: **Presentation & Communication Lead** – Organizes demo presentations and communicates with instructors/TAs.
+* **Mohammad Maaz (30455)**: **Learning & Research Lead** – Researches new Flutter widgets, tools, and relevant APIs.
