@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../utils/app_colors.dart';
 import '../widgets/profile_avatar.dart';
+import '../widgets/bottom_nav_placeholder.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -101,6 +102,28 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: _ActionTile(
+                      title: 'Create Post',
+                      subtitle: 'Share with the campus',
+                      icon: Icons.add_box_outlined,
+                      onTap: () => Navigator.pushNamed(context, '/create_post'),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _ActionTile(
+                      title: 'Settings',
+                      subtitle: 'App & account settings',
+                      icon: Icons.settings_outlined,
+                      onTap: () => Navigator.pushNamed(context, '/settings'),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 18),
               Text(
                 'What is new?',
@@ -128,6 +151,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
+      bottomNavigationBar: const BottomNavPlaceholder(activeTab: BottomTab.home),
     );
   }
 }
