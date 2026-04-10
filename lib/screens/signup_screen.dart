@@ -304,9 +304,8 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
 
             const SizedBox(height: 18),
-
-            // --- Bottom Navigation Bar (visual placeholder only) ---
             const BottomNavPlaceholder(),
+
           ],
         ),
       ),
