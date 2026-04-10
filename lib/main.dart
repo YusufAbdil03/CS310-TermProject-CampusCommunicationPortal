@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'screens/campus_feed_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/home_screen.dart';
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
         scaffoldBackgroundColor: AppColors.background,
+        fontFamily: 'SegoeUICustom',
         useMaterial3: true,
       ),
 
@@ -29,7 +31,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
-        '/home': (context) => const HomeScreen(), // minimal placeholder
+        '/home': (context) => const HomeScreen(),
+        '/feed': (context) => const CampusFeedScreen(),
       },
     );
   }

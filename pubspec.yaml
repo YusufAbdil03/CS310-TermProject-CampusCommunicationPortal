@@ -20,3 +20,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/campus_banner.png
+  fonts:
+    - family: SegoeUICustom
+      fonts:
+        - asset: assets/fonts/SegoeUI.ttf
