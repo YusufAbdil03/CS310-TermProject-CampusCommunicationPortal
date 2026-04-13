@@ -68,7 +68,9 @@ class OtherUserProfileScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/chat');
+                  },
                   icon: const Icon(Icons.send_rounded),
                   label: Text('Send Message', style: AppTextStyles.buttonLabel),
                   style: ElevatedButton.styleFrom(

@@ -7,6 +7,8 @@ import 'screens/create_post_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/messages_list_screen.dart';
 import 'screens/other_user_profile_screen.dart';
+import 'screens/chat_screen.dart';
+import 'screens/my_profile_screen.dart';
 import 'utils/app_colors.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/clubs_screen.dart';
@@ -45,6 +47,8 @@ class MyApp extends StatelessWidget {
         '/other_profile': (context) => const OtherUserProfileScreen(),
         '/notifications': (context) => const NotificationsScreen(),
         '/clubs': (context) => const ClubsScreen(),
+        '/chat': (context) => const ChatScreen(),
+        '/profile': (context) => const MyProfileScreen(),
       },
     );
   }

@@ -100,9 +100,7 @@ class HomeScreen extends StatelessWidget {
                       subtitle: 'Update account information',
                       icon: Icons.manage_accounts_outlined,
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Profile screen soon.')),
-                        );
+                        Navigator.pushNamed(context, '/profile');
                       },
                     ),
                   ),

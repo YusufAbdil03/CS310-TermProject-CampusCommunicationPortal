@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import '../widgets/profile_avatar.dart';
+import '../utils/user_profile_state.dart';
 
 class CreatePostScreen extends StatefulWidget {
   const CreatePostScreen({super.key});
@@ -177,7 +178,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               height: 56,
               child: ElevatedButton(
                 onPressed: () {
-                  // Post action
+                  String finalPost = "${_titleController.text}: ${_contentController.text}";
+                  UserProfileState.addPost(finalPost);
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(

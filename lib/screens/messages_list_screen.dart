@@ -69,7 +69,8 @@ class MessagesListScreen extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   trailing: const Text('14:30', style: TextStyle(fontSize: 12, color: AppColors.subtitle)),
-                  onTap: () {},
+                  onTap: () {Navigator.pushNamed(context, '/chat');
+                    },
                 );
               },
             ),
