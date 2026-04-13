@@ -48,11 +48,15 @@ class BottomNavPlaceholder extends StatelessWidget {
             },
           ),
           _NavItem(
-            icon: Icons.campaign_outlined,
-            label: 'Clubs',
-            isActive: activeTab == BottomTab.clubs,
-            onTap: () {},
-          ),
+  icon: Icons.campaign_outlined,
+  label: 'Clubs',
+  isActive: activeTab == BottomTab.clubs,
+  onTap: () {
+    if (activeTab != BottomTab.clubs) {
+      Navigator.pushNamed(context, '/clubs');
+    }
+  },
+),
           _NavItem(
             icon: activeTab == BottomTab.settings ? Icons.settings : Icons.settings_outlined,
             label: 'Settings',

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../utils/app_colors.dart';
-import '../widgets/profile_avatar.dart';
+
 import '../widgets/bottom_nav_placeholder.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -16,16 +16,22 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Text(
           'Campus Life Hub',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: ProfileAvatar(),
-          ),
-        ],
+        actions: [
+           IconButton(
+              icon: const Icon(Icons.notifications_none),
+              onPressed: () {
+                 Navigator.pushNamed(context, '/notifications');
+             },
+           ),
+         ],
         centerTitle: true,
       ),
       body: SafeArea(
@@ -113,6 +119,7 @@ class HomeScreen extends StatelessWidget {
                       onTap: () => Navigator.pushNamed(context, '/create_post'),
                     ),
                   ),
+                 
                   const SizedBox(width: 10),
                   Expanded(
                     child: _ActionTile(

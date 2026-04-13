@@ -8,6 +8,8 @@ import 'screens/settings_screen.dart';
 import 'screens/messages_list_screen.dart';
 import 'screens/other_user_profile_screen.dart';
 import 'utils/app_colors.dart';
+import 'screens/notifications_screen.dart';
+import 'screens/clubs_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,6 +43,8 @@ class MyApp extends StatelessWidget {
         '/settings': (context) => const SettingsScreen(),
         '/messages': (context) => const MessagesListScreen(),
         '/other_profile': (context) => const OtherUserProfileScreen(),
+        '/notifications': (context) => const NotificationsScreen(),
+        '/clubs': (context) => const ClubsScreen(),
       },
     );
   }
