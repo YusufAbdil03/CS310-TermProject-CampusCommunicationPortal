@@ -12,6 +12,7 @@ import 'screens/my_profile_screen.dart';
 import 'utils/app_colors.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/clubs_screen.dart';
+import 'screens/live_chat_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -49,6 +50,7 @@ class MyApp extends StatelessWidget {
         '/clubs': (context) => const ClubsScreen(),
         '/chat': (context) => const ChatScreen(),
         '/profile': (context) => const MyProfileScreen(),
+        '/live_chat': (context) => const LiveChatScreen(),
       },
     );
   }

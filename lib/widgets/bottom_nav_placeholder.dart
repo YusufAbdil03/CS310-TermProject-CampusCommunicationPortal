@@ -27,7 +27,8 @@ class BottomNavPlaceholder extends StatelessWidget {
             icon: Icons.masks_outlined,
             label: 'Anonym\nChat',
             isActive: activeTab == BottomTab.anonym,
-            onTap: () {},
+            onTap: () {Navigator.pushNamed(context, '/live_chat');
+            },
           ),
           _NavItem(
             icon: Icons.chat_bubble_outline,
