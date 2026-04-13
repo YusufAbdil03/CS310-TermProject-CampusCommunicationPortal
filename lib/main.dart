@@ -5,6 +5,8 @@ import 'screens/signup_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/create_post_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/messages_list_screen.dart';
+import 'screens/other_user_profile_screen.dart';
 import 'utils/app_colors.dart';
 
 void main() {
@@ -37,6 +39,8 @@ class MyApp extends StatelessWidget {
         '/feed': (context) => const CampusFeedScreen(),
         '/create_post': (context) => const CreatePostScreen(),
         '/settings': (context) => const SettingsScreen(),
+        '/messages': (context) => const MessagesListScreen(),
+        '/other_profile': (context) => const OtherUserProfileScreen(),
       },
     );
   }

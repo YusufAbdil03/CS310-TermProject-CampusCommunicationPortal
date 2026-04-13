@@ -33,7 +33,9 @@ class BottomNavPlaceholder extends StatelessWidget {
             icon: Icons.chat_bubble_outline,
             label: 'Messages',
             isActive: activeTab == BottomTab.messages,
-            onTap: () {},
+            onTap: () {if (activeTab != BottomTab.messages) {
+              Navigator.pushNamed(context, '/messages');
+            }},
           ),
           _NavItem(
             icon: activeTab == BottomTab.home ? Icons.home : Icons.home_outlined,
@@ -41,7 +43,7 @@ class BottomNavPlaceholder extends StatelessWidget {
             isActive: activeTab == BottomTab.home,
             onTap: () {
               if (activeTab != BottomTab.home) {
-                Navigator.pop(context);
+                Navigator.pushNamed(context, '/home');
               }
             },
           ),
