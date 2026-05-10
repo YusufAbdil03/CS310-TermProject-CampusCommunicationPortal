@@ -11,9 +11,9 @@ class MessagesListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         shape: const Border(bottom: BorderSide(color: AppColors.primary, width: 2)),
@@ -32,7 +32,7 @@ class MessagesListScreen extends StatelessWidget {
             padding: AppSpacing.pagePadding,
             child: Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFF0F2F0),
+                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: TextFormField(
@@ -50,7 +50,7 @@ class MessagesListScreen extends StatelessWidget {
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: 15,
-              separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFFEEEEEE)),
+              separatorBuilder: (context, index) => Divider(height: 1, color: Theme.of(context).dividerColor),
               itemBuilder: (context, index) {
                 return ListTile(
                   contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -58,9 +58,9 @@ class MessagesListScreen extends StatelessWidget {
                     onTap: () => Navigator.pushNamed(context, '/other_profile'),
                     child: const ProfileAvatar(),
                   ),
-                  title: const Text(
+                  title: Text(
                     'Campus User',
-                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary),
                   ),
                   subtitle: Text(
                     'This message snippet is loaded dynamically from the database...',

@@ -17,8 +17,8 @@ class BottomNavPlaceholder extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.only(top: 10, bottom: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.shade300)),
+        color: Theme.of(context).scaffoldBackgroundColor,
+        border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,

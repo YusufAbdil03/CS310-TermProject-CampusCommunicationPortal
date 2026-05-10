@@ -141,7 +141,7 @@ class _PostCard extends StatelessWidget {
                   return Container(
                     width: double.infinity,
                     height: imageHeight,
-                    color: Colors.grey.shade200,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800 : Colors.grey.shade200,
                     alignment: Alignment.center,
                     child: const Text('Network image failed to load'),
                   );
@@ -151,10 +151,10 @@ class _PostCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               post.title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.primary,
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary,
               ),
             ),
             const SizedBox(height: 6),

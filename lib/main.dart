@@ -13,9 +13,16 @@ import 'utils/app_colors.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/clubs_screen.dart';
 import 'screens/live_chat_screen.dart';
+import 'package:provider/provider.dart';
+import 'providers/theme_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -23,34 +30,45 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Campus Life Hub',
-      debugShowCheckedModeBanner: false,
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          title: 'Campus Life Hub',
+          debugShowCheckedModeBanner: false,
 
-      // Step 3: App-wide theme using primary color
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
-        scaffoldBackgroundColor: AppColors.background,
-        fontFamily: 'SegoeUICustom',
-        useMaterial3: true,
-      ),
+          // Theme Configuration
+          themeMode: themeProvider.themeMode,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
+            scaffoldBackgroundColor: AppColors.background,
+            fontFamily: 'SegoeUICustom',
+            useMaterial3: true,
+          ),
+          darkTheme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary, brightness: Brightness.dark),
+            scaffoldBackgroundColor: const Color(0xFF121212),
+            fontFamily: 'SegoeUICustom',
+            useMaterial3: true,
+          ),
 
-      // Step 3: Named routes — initial route is Login
-      initialRoute: '/login',
-      routes: {
-        '/login': (context) => const LoginScreen(),
-        '/signup': (context) => const SignupScreen(),
-        '/home': (context) => const HomeScreen(),
-        '/feed': (context) => const CampusFeedScreen(),
-        '/create_post': (context) => const CreatePostScreen(),
-        '/settings': (context) => const SettingsScreen(),
-        '/messages': (context) => const MessagesListScreen(),
-        '/other_profile': (context) => const OtherUserProfileScreen(),
-        '/notifications': (context) => const NotificationsScreen(),
-        '/clubs': (context) => const ClubsScreen(),
-        '/chat': (context) => const ChatScreen(),
-        '/profile': (context) => const MyProfileScreen(),
-        '/live_chat': (context) => const LiveChatScreen(),
+          // Step 3: Named routes — initial route is Login
+          initialRoute: '/login',
+          routes: {
+            '/login': (context) => const LoginScreen(),
+            '/signup': (context) => const SignupScreen(),
+            '/home': (context) => const HomeScreen(),
+            '/feed': (context) => const CampusFeedScreen(),
+            '/create_post': (context) => const CreatePostScreen(),
+            '/settings': (context) => const SettingsScreen(),
+            '/messages': (context) => const MessagesListScreen(),
+            '/other_profile': (context) => const OtherUserProfileScreen(),
+            '/notifications': (context) => const NotificationsScreen(),
+            '/clubs': (context) => const ClubsScreen(),
+            '/chat': (context) => const ChatScreen(),
+            '/profile': (context) => const MyProfileScreen(),
+            '/live_chat': (context) => const LiveChatScreen(),
+          },
+        );
       },
     );
   }

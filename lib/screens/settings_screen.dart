@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../utils/app_colors.dart';
 import '../widgets/profile_avatar.dart';
 import '../widgets/bottom_nav_placeholder.dart';
+import '../providers/theme_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -19,7 +21,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primary, size: 20),
@@ -53,20 +55,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Settings',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF141444),
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF141444),
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Manage your app and account\npreferences',
               style: TextStyle(
                 fontSize: 16,
-                color: Color(0xFF4A4A4A),
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : const Color(0xFF4A4A4A),
                 height: 1.2,
               ),
             ),
@@ -75,11 +77,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
             // Settings List Container
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFF0F2F0),
+                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
                 children: [
+                  Consumer<ThemeProvider>(
+                    builder: (context, themeProvider, child) {
+                      return _SettingsToggle(
+                        title: 'Dark Mode',
+                        value: themeProvider.isDarkMode,
+                        onChanged: (val) => themeProvider.toggleTheme(val),
+                      );
+                    },
+                  ),
+                  const Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey),
                   _SettingsToggle(
                     title: 'New Post Notifications',
                     value: _newPostNotifications,
@@ -100,8 +112,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey),
                   InkWell(
                     onTap: () {},
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -109,11 +121,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             'Privacy Policy',
                             style: TextStyle(
                               fontSize: 16,
-                              color: Color(0xFF141444),
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF141444),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF141444)),
+                          Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF141444)),
                         ],
                       ),
                     ),
@@ -178,9 +190,9 @@ class _SettingsToggle extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
-                color: Color(0xFF141444),
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? const Color(0xFF141444),
                 fontWeight: FontWeight.w500,
               ),
             ),

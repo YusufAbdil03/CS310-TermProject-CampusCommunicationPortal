@@ -25,7 +25,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primary, size: 20),
@@ -59,20 +59,20 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Create Post',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF141444), // Slightly darker blue for header
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF141444), // Slightly darker blue for header
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Share your thought or moment\nwith the campus',
               style: TextStyle(
                 fontSize: 16,
-                color: Color(0xFF4A4A4A),
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : const Color(0xFF4A4A4A),
                 height: 1.2,
               ),
             ),
@@ -81,27 +81,28 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             // Post Title Field
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFF0F2F0), // Light greyish background
+                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0), // Light greyish background
                 borderRadius: BorderRadius.circular(16),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Row(
                 children: [
-                  const Icon(Icons.edit_outlined, color: Color(0xFF141444), size: 28),
+                  Icon(Icons.edit_outlined, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF141444), size: 28),
                   const SizedBox(width: 16),
                   Expanded(
                     child: TextField(
                       controller: _titleController,
-                      decoration: const InputDecoration(
+                      style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
+                      decoration: InputDecoration(
                         labelText: 'Post Title:',
                         labelStyle: TextStyle(
-                          color: Color(0xFF141444),
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF141444),
                           fontWeight: FontWeight.w600,
                         ),
                         border: InputBorder.none,
                         floatingLabelBehavior: FloatingLabelBehavior.always,
                         hintText: 'Book Sale',
-                        hintStyle: TextStyle(color: Colors.black54),
+                        hintStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white54 : Colors.black54),
                       ),
                     ),
                   ),
@@ -113,7 +114,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             // What's on your mind Field
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFF0F2F0),
+                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
                 borderRadius: BorderRadius.circular(16),
               ),
               constraints: const BoxConstraints(minHeight: 180),
@@ -131,9 +132,11 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   TextField(
                     controller: _contentController,
                     maxLines: null,
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
+                    decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Book Sale\nBook Sale, Book Event Alerts,\nBook Sale, iBook Books and\nBook Sale',
+                      hintStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white54 : Colors.black54),
                     ),
                   ),
                 ],
@@ -147,25 +150,25 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               borderRadius: BorderRadius.circular(16),
               child: Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF0F2F0),
+                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.image_outlined, color: Color(0xFF141444), size: 28),
-                    SizedBox(width: 16),
+                    Icon(Icons.image_outlined, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF141444), size: 28),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Text(
                         'Attach Image',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Color(0xFF141444),
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF141444),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                    Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF141444)),
+                    Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF141444)),
                   ],
                 ),
               ),

@@ -54,21 +54,21 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       // Step 3: AppBar with back arrow and title
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         shape: const Border(
           bottom: BorderSide(color: AppColors.primary, width: 2),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Student', style: AppTextStyles.appBarTitle),
+        title: Text('Student', style: AppTextStyles.appBarTitle.copyWith(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary)),
         centerTitle: true,
         actions: [
           const Padding(
@@ -86,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
             AppSpacing.large,
 
             // --- Title Area ---
-            Text('Welcome Back', style: AppTextStyles.pageTitle),
+            Text('Welcome Back', style: AppTextStyles.pageTitle.copyWith(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary)),
             AppSpacing.small,
             Text(
               'Login to access your campus life hub',
@@ -105,8 +105,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       hintText: 'name@sabanciuniv.edu',
-                      prefixIcon: const Icon(Icons.person_outline,
-                          color: AppColors.primary),
+                      prefixIcon: Icon(Icons.person_outline,
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : AppColors.primary),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 16,
@@ -137,8 +137,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
                       hintText: 'Enter Password',
-                      prefixIcon: const Icon(Icons.lock_outline,
-                          color: AppColors.primary),
+                      prefixIcon: Icon(Icons.lock_outline,
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : AppColors.primary),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 16,
