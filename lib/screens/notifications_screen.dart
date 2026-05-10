@@ -31,9 +31,9 @@ class NotificationsScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         shape: const Border(
@@ -59,9 +59,9 @@ class NotificationsScreen extends StatelessWidget {
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFF4F7FC),
+              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF4F7FC),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.inputBorder),
+              border: Border.all(color: AppColors.inputBorder.withValues(alpha: Theme.of(context).brightness == Brightness.dark ? 0.3 : 1.0)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,10 +81,10 @@ class NotificationsScreen extends StatelessWidget {
                     children: [
                       Text(
                         item['title']!,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary,
                         ),
                       ),
                       const SizedBox(height: 6),

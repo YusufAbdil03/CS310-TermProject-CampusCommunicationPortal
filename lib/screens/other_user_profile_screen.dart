@@ -9,9 +9,9 @@ class OtherUserProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primary, size: 20),
@@ -30,14 +30,14 @@ class OtherUserProfileScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 24),
-            const Center(
+            Center(
               child: CircleAvatar(
                 radius: 56,
                 backgroundColor: AppColors.primary,
                 child: CircleAvatar(
                   radius: 53,
-                  backgroundColor: Color(0xFFF0F2F0),
-                  child: Icon(Icons.person, size: 60, color: AppColors.primary),
+                  backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
+                  child: const Icon(Icons.person, size: 60, color: AppColors.primary),
                 ),
               ),
             ),
@@ -51,7 +51,7 @@ class OtherUserProfileScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF0F2F0),
+                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -83,13 +83,13 @@ class OtherUserProfileScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 40),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Recent Activities',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF141444)),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF141444)),
                 ),
               ),
             ),
@@ -102,9 +102,9 @@ class OtherUserProfileScreen extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.inputBorder),
+                    border: Border.all(color: AppColors.inputBorder.withValues(alpha: Theme.of(context).brightness == Brightness.dark ? 0.3 : 1.0)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

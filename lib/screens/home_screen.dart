@@ -77,7 +77,7 @@ class HomeScreen extends StatelessWidget {
               Text(
                 'Quick Actions',
                 style: TextStyle(
-                  color: AppColors.primary,
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary,
                   fontSize: compact ? 18 : 20,
                   fontWeight: FontWeight.w700,
                 ),
@@ -133,7 +133,7 @@ class HomeScreen extends StatelessWidget {
               Text(
                 'What is new?',
                 style: TextStyle(
-                  color: AppColors.primary,
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary,
                   fontSize: compact ? 18 : 20,
                   fontWeight: FontWeight.w700,
                 ),
@@ -143,9 +143,9 @@ class HomeScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF4F7FC),
+                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF4F7FC),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.inputBorder),
+                  border: Border.all(color: AppColors.inputBorder.withValues(alpha: Theme.of(context).brightness == Brightness.dark ? 0.3 : 1.0)),
                 ),
                 child: const Text(
                   'Check campus events and announcements from the feed screen.\nYou can also remove items dynamically to demonstrate state updates.',
@@ -182,22 +182,22 @@ class _ActionTile extends StatelessWidget {
       child: Ink(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.inputBorder),
-          color: Colors.white,
+          border: Border.all(color: AppColors.inputBorder.withValues(alpha: Theme.of(context).brightness == Brightness.dark ? 0.3 : 1.0)),
+          color: Theme.of(context).cardColor,
         ),
         padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: AppColors.primary),
+            Icon(icon, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary),
             const SizedBox(height: 8),
             Text(
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w700,
-                color: AppColors.primary,
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary,
               ),
             ),
             const SizedBox(height: 3),

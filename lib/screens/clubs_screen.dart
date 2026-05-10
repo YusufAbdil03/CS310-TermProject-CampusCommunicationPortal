@@ -28,21 +28,21 @@ class ClubsScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         shape: const Border(
           bottom: BorderSide(color: AppColors.primary, width: 2),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Clubs',
-          style: AppTextStyles.appBarTitle,
+          style: AppTextStyles.appBarTitle.copyWith(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary),
         ),
         centerTitle: true,
       ),
@@ -56,19 +56,19 @@ class ClubsScreen extends StatelessWidget {
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFF4F7FC),
+              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF4F7FC),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.inputBorder),
+              border: Border.all(color: AppColors.inputBorder.withValues(alpha: Theme.of(context).brightness == Brightness.dark ? 0.3 : 1.0)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   club['name']!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary,
                   ),
                 ),
                 const SizedBox(height: 8),

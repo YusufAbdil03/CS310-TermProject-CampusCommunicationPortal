@@ -68,9 +68,9 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         shape: const Border(
@@ -110,14 +110,14 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          const Divider(height: 1, color: Color(0xFFE6E6E6)),
+          Divider(height: 1, color: Theme.of(context).dividerColor),
 
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               itemCount: _messages.length,
               separatorBuilder: (_, __) =>
-                  const Divider(height: 18, color: Color(0xFFEEEEEE)),
+                  Divider(height: 18, color: Theme.of(context).dividerColor),
               itemBuilder: (context, index) {
                 final message = _messages[index];
 
@@ -127,18 +127,18 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
                     Text.rich(
                       TextSpan(
                         children: [
-                          const TextSpan(
+                          TextSpan(
                             text: 'Anonymous ',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
                             ),
                           ),
-                          const TextSpan(
+                          TextSpan(
                             text: '•• ',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
                             ),
                           ),
                           TextSpan(
@@ -154,9 +154,9 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
                     const SizedBox(height: 4),
                     Text(
                       message.text,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
-                        color: Colors.black87,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
                         height: 1.3,
                       ),
                     ),
@@ -182,11 +182,12 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF0F2F0),
+                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: TextField(
                         controller: _messageController,
+                        style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
                         decoration: const InputDecoration(
                           hintText: 'Ask a quick question or share something helpful...',
                           hintStyle: TextStyle(

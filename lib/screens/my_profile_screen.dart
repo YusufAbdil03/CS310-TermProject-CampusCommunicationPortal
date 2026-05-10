@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_text_styles.dart';
-import '../utils/app_spacing.dart';
+
 import '../utils/user_profile_state.dart';
 import '../widgets/bottom_nav_placeholder.dart';
 import '../widgets/profile_avatar.dart';
@@ -12,9 +12,9 @@ class MyProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         shape: const Border(bottom: BorderSide(color: AppColors.primary, width: 2)),
@@ -65,7 +65,7 @@ class MyProfileScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF0F2F0),
+                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
@@ -116,7 +116,7 @@ class MyProfileScreen extends StatelessWidget {
                 if (posts.isEmpty) {
                   return Column(
                     children: [
-                      const Icon(Icons.post_add_rounded, size: 64, color: Color(0xFFD1D5DB)),
+                      Icon(Icons.post_add_rounded, size: 64, color: Theme.of(context).brightness == Brightness.dark ? Colors.white38 : const Color(0xFFD1D5DB)),
                       const SizedBox(height: 12),
                       const Text("You haven't posted anything yet.", style: AppTextStyles.subtitle),
                     ],

@@ -19,13 +19,13 @@ class ProfileAvatar extends StatelessWidget {
             height: size,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFFEAF0FA),
+              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFEAF0FA),
               border: Border.all(color: AppColors.primary.withValues(alpha: 0.35)),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
-                  color: Color(0x1A000000),
+                  color: Theme.of(context).shadowColor.withValues(alpha: 0.1),
                   blurRadius: 6,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -48,7 +48,7 @@ class ProfileAvatar extends StatelessWidget {
           child: Text(
             initial,
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.white, // Primary bg is dark blue, white is fine for both, but keeping it explicit
               fontWeight: FontWeight.w700,
               fontSize: size * 0.45,
             ),

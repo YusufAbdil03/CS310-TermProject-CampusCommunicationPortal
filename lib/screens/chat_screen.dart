@@ -46,9 +46,9 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         shape: const Border(bottom: BorderSide(color: AppColors.primary, width: 2)),
@@ -63,7 +63,7 @@ class _ChatScreenState extends State<ChatScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Campus User', style: TextStyle(color: AppColors.primary, fontSize: 16, fontWeight: FontWeight.bold)),
+                Text('Campus User', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary, fontSize: 16, fontWeight: FontWeight.bold)),
                 Text('Online', style: AppTextStyles.subtitle.copyWith(fontSize: 12, color: Colors.green)),
               ],
             ),
@@ -98,7 +98,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                               decoration: BoxDecoration(
-                                color: msg.isMe ? AppColors.primary : const Color(0xFFF0F2F0),
+                                color: msg.isMe ? AppColors.primary : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0)),
                                 borderRadius: BorderRadius.circular(16).copyWith(
                                   bottomRight: msg.isMe ? const Radius.circular(0) : const Radius.circular(16),
                                   bottomLeft: msg.isMe ? const Radius.circular(16) : const Radius.circular(0),
@@ -107,7 +107,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               child: Text(
                                 msg.text,
                                 style: TextStyle(
-                                  color: msg.isMe ? Colors.white : AppColors.primary,
+                                  color: msg.isMe ? Colors.white : (Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary),
                                   fontSize: 15,
                                 ),
                               ),
@@ -130,9 +130,9 @@ class _ChatScreenState extends State<ChatScreen> {
           // MESSAGE WRITING PLACE
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: const BoxDecoration(
-              color: AppColors.background,
-              border: Border(top: BorderSide(color: Color(0xFFEEEEEE))),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
             ),
             child: SafeArea(
               child: Row(
@@ -144,11 +144,12 @@ class _ChatScreenState extends State<ChatScreen> {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF0F2F0),
+                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: TextField(
                         controller: _msgController,
+                        style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
                         decoration: InputDecoration(
                           hintText: 'Type a message...',
                           hintStyle: AppTextStyles.subtitle,
