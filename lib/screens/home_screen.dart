@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 
 import '../widgets/bottom_nav_placeholder.dart';
+import '../widgets/logout_button.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -25,13 +26,12 @@ class HomeScreen extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
-           IconButton(
-              icon: const Icon(Icons.notifications_none),
-              onPressed: () {
-                 Navigator.pushNamed(context, '/notifications');
-             },
-           ),
-         ],
+          IconButton(
+            icon: const Icon(Icons.notifications_none),
+            onPressed: () => Navigator.pushNamed(context, '/notifications'),
+          ),
+          const LogoutButton(),
+        ],
         centerTitle: true,
       ),
       body: SafeArea(

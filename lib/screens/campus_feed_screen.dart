@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/campus_post.dart';
+import '../providers/post_provider.dart';
 import '../utils/app_colors.dart';
 
 class CampusFeedScreen extends StatefulWidget {
@@ -11,58 +13,17 @@ class CampusFeedScreen extends StatefulWidget {
 }
 
 class _CampusFeedScreenState extends State<CampusFeedScreen> {
-  final List<CampusPost> _posts = [
-    const CampusPost(
-      id: '1',
-      title: 'CS310 Study Group',
-      description: 'Join us at FENS for a collaborative exam prep session.',
-      location: 'FENS G062',
-      dateLabel: 'Today, 17:30',
-      assetImagePath: 'assets/images/campus_banner.png',
-      networkImageUrl:
-          'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80',
-    ),
-    const CampusPost(
-      id: '2',
-      title: 'Robotics Club Meetup',
-      description: 'Live demo of autonomous line-following bots in SGM.',
-      location: 'SGM 2010',
-      dateLabel: 'Tomorrow, 14:00',
-      assetImagePath: 'assets/images/campus_banner.png',
-      networkImageUrl:
-          'https://images.unsplash.com/photo-1581094271901-8022df4466f9?auto=format&fit=crop&w=1200&q=80',
-    ),
-    const CampusPost(
-      id: '3',
-      title: 'Career Talk: Product Roles',
-      description: 'Alumni panel discussing internships and new grad hiring.',
-      location: 'Zoom + SUNUM Hall',
-      dateLabel: 'Friday, 12:30',
-      assetImagePath: 'assets/images/campus_banner.png',
-      networkImageUrl:
-          'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80',
-    ),
-  ];
-
-  void _removePost(String id) {
-    final int index = _posts.indexWhere((CampusPost post) => post.id == id);
-    if (index == -1) {
-      return;
-    }
-
-    final CampusPost removed = _posts[index];
-    setState(() {
-      _posts.removeAt(index);
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Removed: ${removed.title}')),
-    );
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() =>
+        context.read<PostProvider>().listenToPosts());
   }
 
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    final postProvider = context.watch<PostProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -73,25 +34,37 @@ class _CampusFeedScreenState extends State<CampusFeedScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: _posts.isEmpty
-              ? const Center(
-                  child: Text(
-                    'No posts left.\nYou removed all cards.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: _posts.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final CampusPost post = _posts[index];
-                    return _PostCard(
-                      post: post,
-                      imageHeight: screenWidth < 420 ? 140 : 180,
-                      onRemove: () => _removePost(post.id),
-                    );
-                  },
+          child: Builder(builder: (_) {
+            if (postProvider.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (postProvider.error != null) {
+              return Center(child: Text('Error: ${postProvider.error}'));
+            }
+            if (postProvider.posts.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No posts yet.\nBe the first to post!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16),
                 ),
+              );
+            }
+            return ListView.builder(
+              itemCount: postProvider.posts.length,
+              itemBuilder: (context, index) {
+                final CampusPost post = postProvider.posts[index];
+                final isOwner = post.createdBy ==
+                    FirebaseAuth.instance.currentUser?.uid;
+                return _PostCard(
+                  post: post,
+                  imageHeight: screenWidth < 420 ? 140 : 180,
+                  isOwner: isOwner,
+                  onDelete: () => postProvider.deletePost(post.id),
+                );
+              },
+            );
+          }),
         ),
       ),
     );
@@ -101,13 +74,15 @@ class _CampusFeedScreenState extends State<CampusFeedScreen> {
 class _PostCard extends StatelessWidget {
   const _PostCard({
     required this.post,
-    required this.onRemove,
+    required this.onDelete,
     required this.imageHeight,
+    required this.isOwner,
   });
 
   final CampusPost post;
-  final VoidCallback onRemove;
+  final VoidCallback onDelete;
   final double imageHeight;
+  final bool isOwner;
 
   @override
   Widget build(BuildContext context) {
@@ -120,41 +95,32 @@ class _PostCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                post.assetImagePath,
-                width: double.infinity,
-                height: imageHeight,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(height: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                post.networkImageUrl,
-                width: double.infinity,
-                height: imageHeight,
-                fit: BoxFit.cover,
-                errorBuilder: (BuildContext context, Object error, StackTrace? _) {
-                  return Container(
+            if (post.networkImageUrl.isNotEmpty)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  post.networkImageUrl,
+                  width: double.infinity,
+                  height: imageHeight,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, _) => Container(
                     width: double.infinity,
                     height: imageHeight,
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800 : Colors.grey.shade200,
+                    color: Colors.grey.shade200,
                     alignment: Alignment.center,
-                    child: const Text('Network image failed to load'),
-                  );
-                },
+                    child: const Text('Image unavailable'),
+                  ),
+                ),
               ),
-            ),
             const SizedBox(height: 10),
             Text(
               post.title,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : AppColors.primary,
               ),
             ),
             const SizedBox(height: 6),
@@ -169,12 +135,12 @@ class _PostCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 8),
-                TextButton.icon(
-                  onPressed: onRemove,
-                  icon: const Icon(Icons.delete_outline),
-                  label: const Text('Remove'),
-                ),
+                if (isOwner)
+                  TextButton.icon(
+                    onPressed: onDelete,
+                    icon: const Icon(Icons.delete_outline),
+                    label: const Text('Delete'),
+                  ),
               ],
             ),
           ],

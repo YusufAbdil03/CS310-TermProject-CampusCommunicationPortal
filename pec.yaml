@@ -1,0 +1,15 @@
+[33m16be26d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfirebase-authentication[m[33m, [m[1;31morigin/firebase-authentication[m[33m)[m Integrate Firebase Auth with MultiProvider and AuthWrapper in main.dart
+[33m1c43735[m Add AuthWrapper for auth-based routing and reusable LogoutButton widget
+[33m1ad206c[m Add LoginScreen and SignupScreen with form validation and error handling
+[33mb84840f[m Add AuthProvider with ChangeNotifier to manage auth state app-wide
+[33m160f24a[m Add AuthService as repository layer for FirebaseAuth operations
+[33m971688e[m Add firebase_core, firebase_auth, and provider dependencies
+[33m8aac6e8[m Add Firebase project configuration and platform setup
+[33m94089e4[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Merge pull request #3 from YusufAbdil03/feature/local-theme-persistence
+[33m7cb4014[m feat: implement local theme persistence and app-wide dark mode support
+[33mca9a0fe[m Add live chat navigation
+[33mb4e45ff[m fixed clubs
+[33m5d51ffe[m Added live chat
+[33m8d770e8[m Chatting and My Profile pages
+[33m4e6afd8[m idil
+[33m2ed32e8[m Messages and others profile screen

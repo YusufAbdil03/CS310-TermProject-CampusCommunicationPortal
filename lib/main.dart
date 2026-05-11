@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+
+import 'firebase_options.dart';
+import 'providers/auth_provider.dart' as app_auth;
+import 'providers/theme_provider.dart';
+import 'widgets/auth_wrapper.dart';
+
 import 'screens/campus_feed_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
@@ -13,16 +21,14 @@ import 'utils/app_colors.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/clubs_screen.dart';
 import 'screens/live_chat_screen.dart';
-import 'package:provider/provider.dart';
-import 'providers/theme_provider.dart';
+import 'providers/post_provider.dart';
 
-void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
-      child: const MyApp(),
-    ),
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -30,46 +36,52 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        return MaterialApp(
-          title: 'Campus Life Hub',
-          debugShowCheckedModeBanner: false,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => app_auth.AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => PostProvider()),
+      ],
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            title: 'Campus Life Hub',
+            debugShowCheckedModeBanner: false,
 
-          // Theme Configuration
-          themeMode: themeProvider.themeMode,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
-            scaffoldBackgroundColor: AppColors.background,
-            fontFamily: 'SegoeUICustom',
-            useMaterial3: true,
-          ),
-          darkTheme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary, brightness: Brightness.dark),
-            scaffoldBackgroundColor: const Color(0xFF121212),
-            fontFamily: 'SegoeUICustom',
-            useMaterial3: true,
-          ),
+            themeMode: themeProvider.themeMode,
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
+              scaffoldBackgroundColor: AppColors.background,
+              fontFamily: 'SegoeUICustom',
+              useMaterial3: true,
+            ),
+            darkTheme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                  seedColor: AppColors.primary, brightness: Brightness.dark),
+              scaffoldBackgroundColor: const Color(0xFF121212),
+              fontFamily: 'SegoeUICustom',
+              useMaterial3: true,
+            ),
 
-          // Step 3: Named routes — initial route is Login
-          initialRoute: '/login',
-          routes: {
-            '/login': (context) => const LoginScreen(),
-            '/signup': (context) => const SignupScreen(),
-            '/home': (context) => const HomeScreen(),
-            '/feed': (context) => const CampusFeedScreen(),
-            '/create_post': (context) => const CreatePostScreen(),
-            '/settings': (context) => const SettingsScreen(),
-            '/messages': (context) => const MessagesListScreen(),
-            '/other_profile': (context) => const OtherUserProfileScreen(),
-            '/notifications': (context) => const NotificationsScreen(),
-            '/clubs': (context) => const ClubsScreen(),
-            '/chat': (context) => const ChatScreen(),
-            '/profile': (context) => const MyProfileScreen(),
-            '/live_chat': (context) => const LiveChatScreen(),
-          },
-        );
-      },
+            home: const AuthWrapper(),
+            routes: {
+              '/login': (context) => const LoginScreen(),
+              '/signup': (context) => const SignupScreen(),
+              '/home': (context) => const HomeScreen(),
+              '/feed': (context) => const CampusFeedScreen(),
+              '/create_post': (context) => const CreatePostScreen(),
+              '/settings': (context) => const SettingsScreen(),
+              '/messages': (context) => const MessagesListScreen(),
+              '/other_profile': (context) => const OtherUserProfileScreen(),
+              '/notifications': (context) => const NotificationsScreen(),
+              '/clubs': (context) => const ClubsScreen(),
+              '/chat': (context) => const ChatScreen(),
+              '/profile': (context) => const MyProfileScreen(),
+              '/live_chat': (context) => const LiveChatScreen(),
+            },
+          );
+        },
+      ),
     );
   }
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "591803136097",
+    "project_id": "campus-hub-life",
+    "storage_bucket": "campus-hub-life.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591803136097:android:b3b77290805b7e6d199220",
+        "android_client_info": {
+          "package_name": "com.example.cs310_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAj_5OUdqN8PFcBHq4cYml4VG3IxmINns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
