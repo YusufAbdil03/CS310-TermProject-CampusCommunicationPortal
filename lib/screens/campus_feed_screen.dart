@@ -1,29 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../models/campus_post.dart';
+import '../providers/auth_provider.dart' as app_auth;
 import '../providers/post_provider.dart';
 import '../utils/app_colors.dart';
 
-class CampusFeedScreen extends StatefulWidget {
+class CampusFeedScreen extends StatelessWidget {
   const CampusFeedScreen({super.key});
-
-  @override
-  State<CampusFeedScreen> createState() => _CampusFeedScreenState();
-}
-
-class _CampusFeedScreenState extends State<CampusFeedScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() =>
-        context.read<PostProvider>().listenToPosts());
-  }
 
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final postProvider = context.watch<PostProvider>();
+    final authProvider = context.watch<app_auth.AuthProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -54,8 +43,7 @@ class _CampusFeedScreenState extends State<CampusFeedScreen> {
               itemCount: postProvider.posts.length,
               itemBuilder: (context, index) {
                 final CampusPost post = postProvider.posts[index];
-                final isOwner = post.createdBy ==
-                    FirebaseAuth.instance.currentUser?.uid;
+                final isOwner = post.createdBy == authProvider.user?.uid;
                 return _PostCard(
                   post: post,
                   imageHeight: screenWidth < 420 ? 140 : 180,

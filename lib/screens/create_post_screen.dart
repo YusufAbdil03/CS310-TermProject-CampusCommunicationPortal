@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../models/campus_post.dart';
+import '../providers/auth_provider.dart' as app_auth;
 import '../providers/post_provider.dart';
 import '../utils/app_colors.dart';
 import '../widgets/profile_avatar.dart';
@@ -39,7 +39,11 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     setState(() => _isPosting = true);
 
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final user = context.read<app_auth.AuthProvider>().user;
+      if (user == null) {
+        throw 'Please log in before creating a post.';
+      }
+
       final post = CampusPost(
         id: '',
         title: _titleController.text.trim(),
@@ -50,7 +54,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         dateLabel: _formattedDate(),
         assetImagePath: 'assets/images/campus_banner.png',
         networkImageUrl: '',
-        createdBy: user?.uid ?? '',
+        createdBy: user.uid,
         createdAt: DateTime.now(),
       );
 
@@ -143,8 +147,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     : const Color(0xFFF0F2F0),
                 borderRadius: BorderRadius.circular(16),
               ),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Row(
                 children: [
                   Icon(Icons.edit_outlined,
@@ -163,20 +166,19 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       decoration: InputDecoration(
                         labelText: 'Post Title:',
                         labelStyle: TextStyle(
-                          color:
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? Colors.white
-                                  : const Color(0xFF141444),
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : const Color(0xFF141444),
                           fontWeight: FontWeight.w600,
                         ),
                         border: InputBorder.none,
                         floatingLabelBehavior: FloatingLabelBehavior.always,
                         hintText: 'Book Sale',
                         hintStyle: TextStyle(
-                            color: Theme.of(context).brightness ==
-                                    Brightness.dark
-                                ? Colors.white54
-                                : Colors.black54),
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white54
+                                    : Colors.black54),
                       ),
                     ),
                   ),
@@ -193,8 +195,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     : const Color(0xFFF0F2F0),
                 borderRadius: BorderRadius.circular(16),
               ),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Row(
                 children: [
                   Icon(Icons.location_on_outlined,
@@ -213,20 +214,19 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       decoration: InputDecoration(
                         labelText: 'Location:',
                         labelStyle: TextStyle(
-                          color:
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? Colors.white
-                                  : const Color(0xFF141444),
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : const Color(0xFF141444),
                           fontWeight: FontWeight.w600,
                         ),
                         border: InputBorder.none,
                         floatingLabelBehavior: FloatingLabelBehavior.always,
                         hintText: 'FENS G062',
                         hintStyle: TextStyle(
-                            color: Theme.of(context).brightness ==
-                                    Brightness.dark
-                                ? Colors.white54
-                                : Colors.black54),
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white54
+                                    : Colors.black54),
                       ),
                     ),
                   ),

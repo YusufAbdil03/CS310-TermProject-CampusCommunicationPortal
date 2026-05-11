@@ -8,8 +8,8 @@ import 'providers/theme_provider.dart';
 import 'widgets/auth_wrapper.dart';
 
 import 'screens/campus_feed_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/signup_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/auth/signup_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/create_post_screen.dart';
 import 'screens/settings_screen.dart';
@@ -40,14 +40,20 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => app_auth.AuthProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => PostProvider()),
+        ChangeNotifierProxyProvider<app_auth.AuthProvider, PostProvider>(
+          create: (_) => PostProvider(),
+          update: (_, authProvider, postProvider) {
+            final provider = postProvider ?? PostProvider();
+            provider.updateUser(authProvider.user?.uid);
+            return provider;
+          },
+        ),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
           return MaterialApp(
             title: 'Campus Life Hub',
             debugShowCheckedModeBanner: false,
-
             themeMode: themeProvider.themeMode,
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
@@ -62,7 +68,6 @@ class MyApp extends StatelessWidget {
               fontFamily: 'SegoeUICustom',
               useMaterial3: true,
             ),
-
             home: const AuthWrapper(),
             routes: {
               '/login': (context) => const LoginScreen(),

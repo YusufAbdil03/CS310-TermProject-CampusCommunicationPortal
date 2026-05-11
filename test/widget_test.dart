@@ -1,30 +1,31 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:cs310_project/main.dart';
+import 'package:cs310_project/models/campus_post.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  test('CampusPost serializes Firestore fields used by PostProvider', () {
+    final createdAt = DateTime(2026, 5, 11);
+    final post = CampusPost(
+      id: 'post-1',
+      title: 'Book Sale',
+      description: 'Selling CS310 books',
+      location: 'FENS G062',
+      dateLabel: '11/5/2026',
+      assetImagePath: 'assets/images/campus_banner.png',
+      networkImageUrl: '',
+      createdBy: 'user-123',
+      createdAt: createdAt,
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    final data = post.toMap();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(data['title'], 'Book Sale');
+    expect(data['description'], 'Selling CS310 books');
+    expect(data['location'], 'FENS G062');
+    expect(data['dateLabel'], '11/5/2026');
+    expect(data['networkImageUrl'], '');
+    expect(data['createdBy'], 'user-123');
+    expect(data['createdAt'], isA<Timestamp>());
   });
 }
