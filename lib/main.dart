@@ -21,6 +21,7 @@ import 'utils/app_colors.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/clubs_screen.dart';
 import 'screens/live_chat_screen.dart';
+import 'providers/post_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => app_auth.AuthProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => PostProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
