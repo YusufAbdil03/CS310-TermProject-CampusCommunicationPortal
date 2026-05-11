@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/auth_provider.dart' as app_auth;
+import '../models/direct_message_model.dart';
+import '../services/firestore_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_text_styles.dart';
 import '../utils/app_spacing.dart';
 import '../widgets/profile_avatar.dart';
-
-class ChatMessage {
-  final String text;
-  final bool isMe;
-  final String time;
-
-  ChatMessage({required this.text, required this.isMe, required this.time});
-}
+import 'other_user_profile_screen.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  final String otherUserId;
+  final String otherUserName;
+
+  const ChatScreen({
+    super.key,
+    required this.otherUserId,
+    required this.otherUserName,
+  });
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -21,30 +27,47 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _msgController = TextEditingController();
-  List<ChatMessage> messages = [
-    ChatMessage(text: "Hey, did you find a good spot for the CS group study session?", isMe: true, time: "14:20"),
-    ChatMessage(text: "Hi! Yes, I found a room in the library. Second floor, room 204.", isMe: false, time: "14:22"),
-    ChatMessage(text: "Perfect, what time? Also, did you review the final project scope?", isMe: true, time: "14:25"),
-    ChatMessage(text: "We booked it for 2 PM. And yes, I'm working on the scope now.", isMe: false, time: "14:30"),
-  ];
+  final FirestoreService _firestoreService = FirestoreService();
+  late String _currentUserId;
 
-  void _sendMessage() {
-    if (_msgController.text.trim().isNotEmpty) {
-      setState(() {
-        messages.add(
-          ChatMessage(
-            text: _msgController.text.trim(),
-            isMe: true,
-            time: "Now",
-          ),
+  @override
+  void initState() {
+    super.initState();
+    final authProvider = Provider.of<app_auth.AuthProvider>(context, listen: false);
+    _currentUserId = authProvider.user?.uid ?? '';
+  }
+
+  @override
+  void dispose() {
+    _msgController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _sendMessage() async {
+    final text = _msgController.text.trim();
+    if (text.isEmpty) return;
+
+    _msgController.clear();
+
+    try {
+      await _firestoreService.sendDirectMessage(widget.otherUserId, text);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to send message: $e')),
         );
-        _msgController.clear();
-      });
+      }
     }
+  }
+
+  String _formatTime(DateTime dateTime) {
+    return DateFormat('HH:mm').format(dateTime);
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -56,78 +79,127 @@ class _ChatScreenState extends State<ChatScreen> {
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Row(
-          children: [
-            const ProfileAvatar(),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Campus User', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary, fontSize: 16, fontWeight: FontWeight.bold)),
-                Text('Online', style: AppTextStyles.subtitle.copyWith(fontSize: 12, color: Colors.green)),
-              ],
-            ),
-          ],
+        title: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OtherUserProfileScreen(userId: widget.otherUserId),
+              ),
+            );
+          },
+          child: Row(
+            children: [
+              const ProfileAvatar(),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.otherUserName,
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : AppColors.primary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      'Online',
+                      style: AppTextStyles.subtitle.copyWith(fontSize: 12, color: Colors.green),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       body: Column(
         children: [
-          // MESSAGES
           Expanded(
-            child: ListView.builder(
-              padding: AppSpacing.pagePadding,
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final msg = messages[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: Row(
-                    mainAxisAlignment: msg.isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      if (!msg.isMe) ...[
-                        const ProfileAvatar(),
-                        const SizedBox(width: 8),
-                      ],
+            child: StreamBuilder<List<DirectMessage>>(
+              stream: _firestoreService.getMessagesStream(widget.otherUserId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-                      // Mesasage bubble
-                      Flexible(
-                        child: Column(
-                          crossAxisAlignment: msg.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              decoration: BoxDecoration(
-                                color: msg.isMe ? AppColors.primary : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0)),
-                                borderRadius: BorderRadius.circular(16).copyWith(
-                                  bottomRight: msg.isMe ? const Radius.circular(0) : const Radius.circular(16),
-                                  bottomLeft: msg.isMe ? const Radius.circular(16) : const Radius.circular(0),
-                                ),
-                              ),
-                              child: Text(
-                                msg.text,
-                                style: TextStyle(
-                                  color: msg.isMe ? Colors.white : (Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.primary),
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              msg.time,
-                              style: const TextStyle(fontSize: 11, color: AppColors.subtitle),
-                            ),
+                if (snapshot.hasError) {
+                  return const Center(child: Text('Error loading messages.'));
+                }
+
+                final messages = snapshot.data ?? [];
+
+                if (messages.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'Say hi to start the conversation! 😊',
+                      style: TextStyle(color: AppColors.subtitle),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: AppSpacing.pagePadding,
+                  reverse: true,
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final msg = messages[index];
+                    final bool isMe = msg.senderId == _currentUserId;
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: Row(
+                        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          if (!isMe) ...[
+                            const ProfileAvatar(),
+                            const SizedBox(width: 8),
                           ],
-                        ),
+                          Flexible(
+                            child: Column(
+                              crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: isMe
+                                        ? AppColors.primary
+                                        : (isDarkMode ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0)),
+                                    borderRadius: BorderRadius.circular(16).copyWith(
+                                      bottomRight: isMe ? const Radius.circular(0) : const Radius.circular(16),
+                                      bottomLeft: isMe ? const Radius.circular(16) : const Radius.circular(0),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    msg.text,
+                                    style: TextStyle(
+                                      color: isMe
+                                          ? Colors.white
+                                          : (isDarkMode ? Colors.white : AppColors.primary),
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _formatTime(msg.createdAt),
+                                  style: const TextStyle(fontSize: 11, color: AppColors.subtitle),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 );
               },
             ),
           ),
-
-          // MESSAGE WRITING PLACE
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
@@ -137,19 +209,15 @@ class _ChatScreenState extends State<ChatScreen> {
             child: SafeArea(
               child: Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.add_circle_outline, color: AppColors.subtitle),
-                    onPressed: () {},
-                  ),
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
+                        color: isDarkMode ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: TextField(
                         controller: _msgController,
-                        style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
+                        style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                         decoration: InputDecoration(
                           hintText: 'Type a message...',
                           hintStyle: AppTextStyles.subtitle,

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../utils/app_colors.dart';
 import '../widgets/profile_avatar.dart';
 import '../widgets/bottom_nav_placeholder.dart';
@@ -15,10 +18,11 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _newPostNotifications = true;
   bool _clubEventAlerts = true;
-  bool _directMessages = false;
 
   @override
   Widget build(BuildContext context) {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -73,76 +77,93 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 32),
-            
-            // Settings List Container
-            Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                children: [
-                  Consumer<ThemeProvider>(
-                    builder: (context, themeProvider, child) {
-                      return _SettingsToggle(
-                        title: 'Dark Mode',
-                        value: themeProvider.isDarkMode,
-                        onChanged: (val) => themeProvider.toggleTheme(val),
-                      );
-                    },
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey),
-                  _SettingsToggle(
-                    title: 'New Post Notifications',
-                    value: _newPostNotifications,
-                    onChanged: (val) => setState(() => _newPostNotifications = val),
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey),
-                  _SettingsToggle(
-                    title: 'Club Event Alerts',
-                    value: _clubEventAlerts,
-                    onChanged: (val) => setState(() => _clubEventAlerts = val),
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey),
-                  _SettingsToggle(
-                    title: 'Direct Messages',
-                    value: _directMessages,
-                    onChanged: (val) => setState(() => _directMessages = val),
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey),
-                  InkWell(
-                    onTap: () {},
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Privacy Policy',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF141444),
-                              fontWeight: FontWeight.w500,
+
+            StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance.collection('users').doc(currentUserId).snapshots(),
+                builder: (context, snapshot) {
+
+                  bool isDmEnabled = true;
+                  if (snapshot.hasData && snapshot.data!.exists) {
+                    final data = snapshot.data!.data() as Map<String, dynamic>;
+                    isDmEnabled = data['isDmEnabled'] ?? true;
+                  }
+
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      children: [
+                        Consumer<ThemeProvider>(
+                          builder: (context, themeProvider, child) {
+                            return _SettingsToggle(
+                              title: 'Dark Mode',
+                              value: themeProvider.isDarkMode,
+                              onChanged: (val) => themeProvider.toggleTheme(val),
+                            );
+                          },
+                        ),
+                        const Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey),
+                        _SettingsToggle(
+                          title: 'New Post Notifications',
+                          value: _newPostNotifications,
+                          onChanged: (val) => setState(() => _newPostNotifications = val),
+                        ),
+                        const Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey),
+                        _SettingsToggle(
+                          title: 'Club Event Alerts',
+                          value: _clubEventAlerts,
+                          onChanged: (val) => setState(() => _clubEventAlerts = val),
+                        ),
+                        const Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey),
+
+                        _SettingsToggle(
+                          title: 'Direct Messages',
+                          value: isDmEnabled,
+                          onChanged: (val) {
+                            FirebaseFirestore.instance.collection('users').doc(currentUserId).update({
+                              'isDmEnabled': val
+                            });
+                          },
+                        ),
+
+                        const Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey),
+                        InkWell(
+                          onTap: () {},
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Privacy Policy',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF141444),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF141444)),
+                              ],
                             ),
                           ),
-                          Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF141444)),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
+                  );
+                }
             ),
             const SizedBox(height: 40),
-            
-            // Log Out Button
             SizedBox(
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: () {
-                  // Log out action
-                  Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  if (context.mounted) {
+                    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFB71C1C), // Deep Red

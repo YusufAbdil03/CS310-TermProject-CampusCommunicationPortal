@@ -1,128 +1,181 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/post_provider.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_text_styles.dart';
-import '../widgets/profile_avatar.dart';
+import 'chat_screen.dart';
 
 class OtherUserProfileScreen extends StatelessWidget {
-  const OtherUserProfileScreen({super.key});
+  final String userId;
+
+  const OtherUserProfileScreen({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        shape: const Border(bottom: BorderSide(color: AppColors.primary, width: 2)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primary, size: 20),
-          onPressed: () => Navigator.of(context).maybePop(),
+          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          onPressed: () => Navigator.pop(context),
         ),
         title: Text('Student Profile', style: AppTextStyles.appBarTitle),
         centerTitle: true,
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: ProfileAvatar(),
-          ),
-        ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 24),
-            Center(
-              child: CircleAvatar(
-                radius: 56,
-                backgroundColor: AppColors.primary,
-                child: CircleAvatar(
-                  radius: 53,
-                  backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
-                  child: const Icon(Icons.person, size: 60, color: AppColors.primary),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text('User Full Name', style: AppTextStyles.pageTitle),
-            const SizedBox(height: 4),
-            Text('Student Department', style: AppTextStyles.subtitle),
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  'User biography and personal information pulled dynamically from the system backend.',
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.body.copyWith(height: 1.5),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/chat');
-                  },
-                  icon: const Icon(Icons.send_rounded),
-                  label: Text('Send Message', style: AppTextStyles.buttonLabel),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    elevation: 0,
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance.collection('users').doc(userId).snapshots(),
+        builder: (context, userSnapshot) {
+          if (userSnapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
+            return const Center(child: Text("User profile not found."));
+          }
+
+          var userData = userSnapshot.data!.data() as Map<String, dynamic>;
+          String fullName = userData['fullName'] ?? 'Unknown User';
+          String bio = userData['bio'] ?? 'No bio available.';
+          bool isDmEnabled = userData['isDmEnabled'] ?? true;
+
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                CircleAvatar(
+                  radius: 50,
+                  backgroundColor: AppColors.primary,
+                  child: Text(
+                    fullName.isNotEmpty ? fullName[0].toUpperCase() : '?',
+                    style: const TextStyle(fontSize: 40, color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 40),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Recent Activities',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF141444)),
-                ),
-              ),
-            ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 3,
-              itemBuilder: (context, index) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.inputBorder.withValues(alpha: Theme.of(context).brightness == Brightness.dark ? 0.3 : 1.0)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Dynamic post content title placeholder.',
-                        style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.primary),
+                const SizedBox(height: 16),
+                Text(fullName, style: AppTextStyles.pageTitle),
+                const SizedBox(height: 24),
+                if (isDmEnabled)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.send_rounded),
+                        label: const Text('Send Message', style: AppTextStyles.buttonLabel),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                otherUserId: userId,
+                                otherUserName: fullName,
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                      const SizedBox(height: 8),
-                      const Text('Time ago', style: TextStyle(fontSize: 12, color: AppColors.subtitle)),
-                    ],
+                    ),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                          color: Colors.grey.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(12)
+                      ),
+                      child: const Text(
+                        'This user has disabled direct messages.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
+                      ),
+                    ),
                   ),
-                );
-              },
+                // ----------------------------------------
+
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: isDarkMode ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('User Bio', style: AppTextStyles.subtitle),
+                        const SizedBox(height: 4),
+                        Text(bio, style: AppTextStyles.body),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Posts by $fullName', style: AppTextStyles.pageTitle.copyWith(fontSize: 20)),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Consumer<PostProvider>(
+                  builder: (context, postProvider, child) {
+                    if (postProvider.isLoading) return const CircularProgressIndicator();
+
+                    final userPosts = postProvider.posts.where((p) => p.createdBy == userId).toList();
+
+                    if (userPosts.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text("This user hasn't posted anything yet.", style: AppTextStyles.subtitle),
+                      );
+                    }
+
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: userPosts.length,
+                      itemBuilder: (context, index) {
+                        final post = userPosts[index];
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: AppColors.primary,
+                            child: Text(
+                              fullName.isNotEmpty ? fullName[0].toUpperCase() : '?',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          title: Text(post.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle: Text(post.description),
+                        );
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(height: 40),
+              ],
             ),
-            const SizedBox(height: 30),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

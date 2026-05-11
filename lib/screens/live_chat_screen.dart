@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/auth_provider.dart' as app_auth;
+import '../models/chat_message_model.dart';
+import '../services/firestore_service.dart';
 import '../utils/app_colors.dart';
 import '../widgets/bottom_nav_placeholder.dart';
 import '../widgets/profile_avatar.dart';
@@ -13,35 +17,9 @@ class LiveChatScreen extends StatefulWidget {
 
 class _LiveChatScreenState extends State<LiveChatScreen> {
   final TextEditingController _messageController = TextEditingController();
+  final FirestoreService _firestoreService = FirestoreService();
 
-  final List<_ChatMessage> _messages = [
-    _ChatMessage(
-      timeAgo: '12 mins ago',
-      text: 'Someone left AirPods at the library front desk.',
-      reactions: '😂 2  😐 1',
-    ),
-    _ChatMessage(
-      timeAgo: '10 mins ago',
-      text: 'What time is the AI Club event today?',
-    ),
-    _ChatMessage(
-      timeAgo: '3 mins ago',
-      text: 'There is a lost kitty in FASS. Does it belong to someone?',
-      reactions: '😂 6',
-    ),
-    _ChatMessage(
-      timeAgo: '1 min ago',
-      text: 'Can someone tell the Kurtköy shuttle to wait 1 minute please?',
-    ),
-    _ChatMessage(
-      timeAgo: '1 min ago',
-      text: 'I told the driver, run.',
-    ),
-    _ChatMessage(
-      timeAgo: 'Just now',
-      text: 'What is the phone number of Pizza Bulls?',
-    ),
-  ];
+  final List<String> _availableEmojis = ['😂', '👍', '❤️', '😐'];
 
   @override
   void dispose() {
@@ -49,24 +27,38 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
     super.dispose();
   }
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
-    setState(() {
-      _messages.add(
-        _ChatMessage(
-          timeAgo: 'Just now',
-          text: text,
-        ),
-      );
-    });
-
     _messageController.clear();
+
+    try {
+      await _firestoreService.sendAnonymousMessage(text);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to send message: $e')),
+        );
+      }
+    }
+  }
+
+  String _getTimeAgo(DateTime dateTime) {
+    final difference = DateTime.now().difference(dateTime);
+    if (difference.inMinutes < 1) return 'Just now';
+    if (difference.inMinutes < 60) return '${difference.inMinutes} mins ago';
+    if (difference.inHours < 24) return '${difference.inHours} hrs ago';
+    return '${difference.inDays} days ago';
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    final authProvider = Provider.of<app_auth.AuthProvider>(context, listen: false);
+    final currentUserId = authProvider.user?.uid ?? '';
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -78,9 +70,7 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primary),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Live Chat',
@@ -113,61 +103,108 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
           Divider(height: 1, color: Theme.of(context).dividerColor),
 
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              itemCount: _messages.length,
-              separatorBuilder: (_, __) =>
-                  Divider(height: 18, color: Theme.of(context).dividerColor),
-              itemBuilder: (context, index) {
-                final message = _messages[index];
+            child: StreamBuilder<List<ChatMessage>>(
+              stream: _firestoreService.getLiveChatStream(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Anonymous ',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '•• ',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
-                            ),
-                          ),
-                          TextSpan(
-                            text: message.timeAgo,
-                            style: const TextStyle(
-                              color: AppColors.subtitle,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error loading chat: ${snapshot.error}'));
+                }
+
+                final messages = snapshot.data ?? [];
+
+                if (messages.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'No messages yet.\nStart the conversation!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: AppColors.subtitle),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      message.text,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
-                        height: 1.3,
-                      ),
-                    ),
-                    if (message.reactions != null) ...[
-                      const SizedBox(height: 6),
-                      Text(
-                        message.reactions!,
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                    ],
-                  ],
+                  );
+                }
+
+                return ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  reverse: false,
+                  itemCount: messages.length,
+                  separatorBuilder: (_, __) => Divider(height: 18, color: Theme.of(context).dividerColor),
+                  itemBuilder: (context, index) {
+                    final message = messages[index];
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Anonymous ',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
+                                ),
+                              ),
+                              TextSpan(
+                                text: '•• ',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
+                                ),
+                              ),
+                              TextSpan(
+                                text: _getTimeAgo(message.createdAt),
+                                style: const TextStyle(
+                                  color: AppColors.subtitle,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          message.text,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: isDarkMode ? Colors.white70 : Colors.black87,
+                            height: 1.3,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+
+                        Wrap(
+                          spacing: 12,
+                          children: _availableEmojis.map((emoji) {
+                            final reactedUsers = message.reactions[emoji] ?? [];
+                            final count = reactedUsers.length;
+                            final hasReacted = reactedUsers.contains(currentUserId);
+
+                            return InkWell(
+                              onTap: () => _firestoreService.toggleReaction(message.id, emoji, hasReacted),
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  // Highlight differently if the current user reacted
+                                  color: hasReacted
+                                      ? AppColors.primary.withValues(alpha: 0.2)
+                                      : (count > 0 ? AppColors.primary.withValues(alpha: 0.05) : Colors.transparent),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  count > 0 ? '$emoji $count' : emoji,
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
             ),
@@ -182,12 +219,12 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
+                        color: isDarkMode ? const Color(0xFF1E1E1E) : const Color(0xFFF0F2F0),
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: TextField(
                         controller: _messageController,
-                        style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
+                        style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                         decoration: const InputDecoration(
                           hintText: 'Ask a quick question or share something helpful...',
                           hintStyle: TextStyle(
@@ -232,16 +269,4 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
       ),
     );
   }
-}
-
-class _ChatMessage {
-  final String timeAgo;
-  final String text;
-  final String? reactions;
-
-  _ChatMessage({
-    required this.timeAgo,
-    required this.text,
-    this.reactions,
-  });
 }
